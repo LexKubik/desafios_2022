@@ -51,8 +51,8 @@ class Template(object):
 
 		for cnt in contours:
 			x,y,w,h=cv2.boundingRect(cnt)
-                	if w*h>400:
-				cv2.rectangle(image_out, (x,y), (x+w,y+h), (0,0,255), 2)
+			if w*h>400:
+                		cv2.rectangle(image_out, (x,y), (x+w,y+h), (0,0,255), 2)
 
 		msg = self.bridge.cv2_to_imgmsg(image_out, "bgr8")	
 
