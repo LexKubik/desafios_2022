@@ -1,9 +1,10 @@
+
 #!/usr/bin/env python
 
 import rospy #importar ros para python
 from std_msgs.msg import String, Int32 # importar mensajes de ROS tipo String y tipo Int32
-from geometry_msgs.msg import Twist # importar mensajes de ROS tipo geometry / Twist
-from sensor_msgs.msg import Image # importar mensajes de ROS tipo Image
+from geometry_msgs.msg import Twist, Point # importar mensajes de ROS tipo geometry / Twist
+from sensor_msgs.msg import Image  # importar mensajes de ROS tipo Image
 import cv2 # importar libreria opencv
 from cv_bridge import CvBridge # importar convertidor de formato de imagenes
 import numpy as np # importar libreria numpy
@@ -13,8 +14,10 @@ class Template(object):
 	def __init__(self, args):
 		super(Template, self).__init__()
 		self.args = args
-		self.sub= rospy.Subscriber('/duckiebot/camera_node/image/raw', Image, self.callback)
+		self.sub= rospy.Subscriber('/duckiebot/camera_node/image/rect', Image, self.callback)
 		self.pub = rospy.Publisher("/duckiebot/mascara", Image, queue_size=10)
+		self.pubDeteccion = rospy.Publisher("/duckiebot/detecciones", Image, queue_size = 10)
+		self.pubPosicion = rospy.Publisher("/duckiebot/Posicion", Point, queue_size = 10)
 		#self.pub1 = rospy.Publisher("/duckiebot/patogris", Image, queue_size=10)
 		#self.pub2 = rospy.Publisher("/duckiebot/patohsv", Image, queue_size=10)
 		#self.pub3 = rospy.Publisher("/duckiebot/patobgr", Image, queue_size=10)
@@ -30,6 +33,7 @@ class Template(object):
 		#self.pub1.publish(msg_gris)
 		
 		image_out_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+		
 		#msg_hsv = self.bridge.cv2_to_imgmsg(image_out_hsv, "bgr8")
 		#self.pub2.publish(msg_hsv)
 		
@@ -37,8 +41,9 @@ class Template(object):
 		#msg_bgr = self.bridge.cv2_to_imgmsg(image_out_bgr, "bgr8")
 		#self.pub3.publish(msg_bgr)
 		
-		lower_limit = np.array([15, 100,100])
-		upper_limit = np.array([50, 255, 255])
+		
+		lower_limit = np.array([15, 140,120])
+		upper_limit = np.array([90, 255, 255])
 
 		mask = cv2.inRange(image_out_hsv, lower_limit, upper_limit) 
 
@@ -48,17 +53,24 @@ class Template(object):
 		_,contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
 		image_out = cv2.bitwise_and(image, image, mask= mask)
+		
+		distancia = Point()
 
-		for cnt in contours:
+                for cnt in contours:
 			x,y,w,h=cv2.boundingRect(cnt)
 			if w*h>400:
                 		cv2.rectangle(image_out, (x,y), (x+w,y+h), (0,0,255), 2)
-
-		msg = self.bridge.cv2_to_imgmsg(image_out, "bgr8")	
-
-		self.pub.publish(msg)
+				Dr =( 3 * 101.859163)/ h
+				
+                		distancia.x = x
+                		distancia.y = y
+                		distancia.z = Dr
 		
-	#def procesar_img(self, img):
+		self.pubPosicion.publish(distancia)
+		msg = self.bridge.cv2_to_imgmsg(image_out, "bgr8")
+		  	
+		self.pub.publish(msg)
+		#def procesar_img(self, img):
 		# Cambiar espacio de color
 
 		# Filtrar rango util
