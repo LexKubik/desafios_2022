@@ -14,14 +14,14 @@ class Template(object):
 		super(Template, self).__init__()
 		self.args = args
 		self.sub = rospy.Subscriber("/duckiebot/joy",Joy,self.callback)
-		self.pub = rospy.Publisher("/duckiebot/possible_cmd", Twist2DStamped)
+		self.pub = rospy.Publisher("/duckiebot/possible_cmd", Twist2DStamped,queue_size=1)
 		self.new_msg = Twist2DStamped()	
 	def publicar(self,msg):
 		self.pub.publish(msg)
 	
 	def callback(self,msg):
 		B=(msg.buttons)[1]
-		if B==1 or 
+		if B==1:
 			x = 0
 			y = 0
 		else:
@@ -43,13 +43,12 @@ class Template(object):
 			# print("\nEje 0, rango [-10,10]: "+ str(eje0p3))
 			# print("Eje 1, rango [-10,10]: "+ str(eje1p3))
 		
-		
-               self.new_msg.v = y
-               self.new_msg.omega = -x
-               self.pub.publish(self.new_msg)		
+		self.new_msg.v = y
+                self.new_msg.omega = -x
+                self.pub.publish(self.new_msg)		
 
 def main():
-	rospy.init_node('test') #creacion y registro del nodo!
+	rospy.init_node('inst_joystick') #creacion y registro del nodo!
 
 	obj = Template('args') # Crea un objeto del tipo Template, cuya definicion se encuentra arriba
 #duckiebot@duckiebot:o obj de tipo Template

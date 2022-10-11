@@ -12,18 +12,26 @@ import numpy as np # importar libreria numpy
 
 class Nodo(object):
 	def __init__(self, args):
-		super(Template, self).__init__()
+		super(Nodo, self).__init__()
 		self.args = args
 		self.subPosicion= rospy.Subscriber('/duckiebot/Posicion', Point, self.posicion)
 		self.subcmd = rospy.Subscriber("/duckiebot/possible_cmd",Twist2DStamped, self.joystick)
-
+		self.pub = rospy.Publisher("/duckiebot/wheels_driver_node/car_cmd",Twist2DStamped,queue_size=1)
+		self.new_msg = Twist2DStamped()
+		self.Joy_msg = Twist2DStamped()
 	#def publicar(self):
 
+	def joystick(self,msg):
+		self.Joy_msg = msg
+
 	def posicion(self,msg):
-		self.msgJoy = msg
-
-	def joystick(self,msg)
-
+		if msg.z<20:
+			self.new_msg.v = 0
+	                self.new_msg.omega = 0
+		else:
+			self.new_msg= self.msgJoy
+		
+		self.pub.publish(self.new_msg)
 	#def procesar_img(self, img):
 		# Cambiar espacio de color
 

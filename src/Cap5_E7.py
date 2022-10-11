@@ -87,7 +87,7 @@ class Template(object):
 
 
 def main():
-	rospy.init_node('test') #creacion y registro del nodo!
+	rospy.init_node('posicion_deteccion') #creacion y registro del nodo!
 
 	obj = Template('args') # Crea un objeto del tipo Template, cuya definicion se encuentra arriba
 

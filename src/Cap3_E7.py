@@ -14,7 +14,7 @@ class Template(object):
 		super(Template, self).__init__()
 		self.args = args
 		self.sub = rospy.Subscriber("/duckiebot/joy",Joy,self.callback)
-		self.pub = rospy.Publisher("/duckiebot/wheels_driver_node/car_cmd", Twist2DStamped)
+		self.pub = rospy.Publisher("/duckiebot/wheels_driver_node/car_cmd", Twist2DStamped,queue_size=10)
 		self.new_msg = Twist2DStamped()	
 	def publicar(self,msg):
 		self.pub.publish(msg)
@@ -43,10 +43,9 @@ class Template(object):
 			# print("\nEje 0, rango [-10,10]: "+ str(eje0p3))
 			# print("Eje 1, rango [-10,10]: "+ str(eje1p3))
 		
-		
-               self.new_msg.v = y
-               self.new_msg.omega = -x
-               self.pub.publish(self.new_msg)		
+		self.new_msg.v = y
+                self.new_msg.omega = -x
+                self.pub.publish(self.new_msg)		
 
 def main():
 	rospy.init_node('test') #creacion y registro del nodo!
