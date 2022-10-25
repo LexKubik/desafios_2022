@@ -28,8 +28,9 @@ class Nodo(object):
 		if msg.z<20:
 			self.new_msg.v = 0
 	                self.new_msg.omega = 0
+			print("controller")
 		else:
-			self.new_msg= self.msgJoy
+			self.new_msg= self.Joy_msg
 		
 		self.pub.publish(self.new_msg)
 	#def procesar_img(self, img):
