@@ -25,10 +25,10 @@ class Nodo(object):
 		self.Joy_msg = msg
 
 	def posicion(self,msg):
-		if msg.z<20:
+		if msg.z<20 and msg.z>0:
 			self.new_msg.v = 0
 	                self.new_msg.omega = 0
-			print("controller")
+			#print("controller:",msg.z)
 		else:
 			self.new_msg= self.Joy_msg
 		
